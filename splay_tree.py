@@ -1,12 +1,12 @@
-from tree_adt import BST_ADT
-class BSTNode:
+from tree_adt import Tree_ADT
+class SplayNode:
     def __init__(self, data, left=None, right=None, parent=None):
         self.data = data
         self.left = left
         self.right = right
         self.parent = parent
 
-class Splay_tree(BST_ADT):
+class Splay_tree(Tree_ADT):
     def _rotate_left(self, node):
         p = node.parent
         p.right = node.left
@@ -92,13 +92,13 @@ class Splay_tree(BST_ADT):
     def add(self, item):
         if self.is_empty():
             self._size=1
-            self._root=BSTNode(item)
+            self._root=SplayNode(item)
         else:
             curr=self._root
             while True:
                 if item<curr.data:
                     if not curr.left:
-                        new=BSTNode(item)
+                        new=SplayNode(item)
                         curr.left=new
                         new.parent=curr
                         self._size+=1
@@ -107,7 +107,7 @@ class Splay_tree(BST_ADT):
                     curr=curr.left
                 elif item>curr.data:
                     if not curr.right:
-                        new=BSTNode(item)
+                        new=SplayNode(item)
                         curr.right=new
                         new.parent=curr
                         self._size+=1
@@ -155,3 +155,39 @@ class Splay_tree(BST_ADT):
                 right.parent=max_node
             self._root=max_node
         self._size-=1
+
+    def inorder(self):
+        lst = []
+
+        def recurse(node):
+            if node != None:
+                recurse(node.left)
+                lst.append(node.data)
+                recurse(node.right)
+
+        recurse(self._root)
+        return iter(lst)
+
+    def preorder(self):
+        lst = []
+
+        def recurse(node):
+            if node != None:
+                lst.append(node.data)
+                recurse(node.left)
+                recurse(node.right)
+
+        recurse(self._root)
+        return iter(lst)
+
+    def postorder(self):
+        lst = []
+
+        def recurse(node):
+            if node != None:
+                recurse(node.left)
+                recurse(node.right)
+                lst.append(node.data)
+
+        recurse(self._root)
+        return iter(lst)

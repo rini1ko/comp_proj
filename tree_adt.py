@@ -1,12 +1,10 @@
 from abc import ABC, abstractmethod
 
-class BSTNode:
-    def __init__(self, data, left=None, right=None):
+class TreeNode:
+    def __init__(self, data):
         self.data = data
-        self.left = left
-        self.right = right
 
-class BST_ADT(ABC):
+class Tree_ADT(ABC):
     def __init__(self, root=None):
         self._root=root
         self._size=0
@@ -14,52 +12,21 @@ class BST_ADT(ABC):
     def is_empty(self):
         return self._size==0
 
+    @abstractmethod
     def find(self, value):
-        node = self._root
-        while node is not None:
-            if value == node.data:
-                return True, node
-            elif value < node.data:
-                node = node.left
-            else:
-                node = node.right
-        return False, None
+        pass
 
+    @abstractmethod
     def inorder(self):
-        lst = list()
+        pass
 
-        def recurse(node):
-            if node != None:
-                recurse(node.left)
-                lst.append(node.data)
-                recurse(node.right)
-
-        recurse(self._root)
-        return iter(lst)
-
+    @abstractmethod
     def preorder(self):
-        lst = list()
+        pass
 
-        def recurse(node):
-            if node != None:
-                lst.append(node.data)
-                recurse(node.left)
-                recurse(node.right)
-
-        recurse(self._root)
-        return iter(lst)
-
+    @abstractmethod
     def postorder(self):
-        lst = list()
-
-        def recurse(node):
-            if node != None:
-                recurse(node.left)
-                recurse(node.right)
-                lst.append(node.data)
-
-        recurse(self._root)
-        return iter(lst)
+        pass
 
     @abstractmethod
     def add(self, item):
@@ -74,5 +41,5 @@ class BST_ADT(ABC):
         pass
 
     @abstractmethod
-    def _rotate_left(self, y):
+    def _rotate_left(self, x):
         pass

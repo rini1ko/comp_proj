@@ -1,13 +1,13 @@
-from tree_adt import BST_ADT, BSTNode
+from tree_adt import Tree_ADT, TreeNode
 
-class AVLNode(BSTNode):
-    def __init__(self, data, left=None, right=None):
-        super().__init__(data, left, right)
+class AVLNode(TreeNode):
+    def __init__(self, data):
+        super().__init__(data)
+        self.left=None
+        self.right=None
         self.height=1
 
-class AVL_Tree(BST_ADT):
-    def __init__(self, root=None):
-        super().__init__(root)
+class AVL_Tree(Tree_ADT):
 
     def add(self, item):
         def _add_recursion(node, item):
@@ -121,3 +121,50 @@ class AVL_Tree(BST_ADT):
         x.height = 1+max(self._get_height(x.left), self._get_height(x.right))
         y.height = 1+max(self._get_height(y.left), self._get_height(y.right))
         return y
+
+    def find(self, value):
+        node = self._root
+        while node is not None:
+            if value == node.data:
+                return True, node
+            elif value < node.data:
+                node = node.left
+            else:
+                node = node.right
+        return False, None
+
+    def inorder(self):
+        lst = []
+
+        def recurse(node):
+            if node != None:
+                recurse(node.left)
+                lst.append(node.data)
+                recurse(node.right)
+
+        recurse(self._root)
+        return iter(lst)
+
+    def preorder(self):
+        lst = []
+
+        def recurse(node):
+            if node != None:
+                lst.append(node.data)
+                recurse(node.left)
+                recurse(node.right)
+
+        recurse(self._root)
+        return iter(lst)
+
+    def postorder(self):
+        lst = []
+
+        def recurse(node):
+            if node != None:
+                recurse(node.left)
+                recurse(node.right)
+                lst.append(node.data)
+
+        recurse(self._root)
+        return iter(lst)
