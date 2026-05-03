@@ -191,3 +191,44 @@ class Splay_tree(Tree_ADT):
 
         recurse(self._root)
         return iter(lst)
+def validate_tree_integrity(tree):
+    """
+    перевірка на інордер обхід, на коректне сполучення нод.
+    """
+    if tree.is_empty():
+        return True, "Дерево порожнє."
+    values = list(tree.inorder())
+    if values != sorted(values):
+        return False, f"Порушено порядок BST: {values}"
+    if len(values) != len(set(values)):
+        return False, "Дерево містить дублікати (для BST це зазвичай помилка)."
+    if tree._root.parent is not None:
+        return False, "Помилка: Корінь має посилання на батька."
+    def check_links(node):
+        if node is None:
+            return True
+        if node.left:
+            if node.left.parent != node:
+                print(f"Помилка зв'язку: {node.left.data} <-X- {node.data}")
+                return False
+        if node.right:
+            if node.right.parent != node:
+                print(f"Помилка зв'язку: {node.data} -X-> {node.right.data}")
+                return False
+        return check_links(node.left) and check_links(node.right)
+    if not check_links(tree._root):
+        return False, "Структурна цілісність (parent pointers) порушена."
+    return True, f"OK: {len(values)} вузлів, BST та структура в нормі."
+
+if __name__=='__main__':
+    tree1 = Splay_tree()
+    for i in range(1, 6):
+        tree1.add(i)
+    success, message = validate_tree_integrity(tree1)
+    print(message)
+    tree1.delete(3)
+    success, message = validate_tree_integrity(tree1)
+    print(message)
+    tree1.add(19)
+    success, message = validate_tree_integrity(tree1)
+    print(message)
