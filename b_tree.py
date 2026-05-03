@@ -15,7 +15,7 @@ class BTree(Tree_ADT):
     def __init__(self, m):
         super().__init__()
         if m < 3:
-            raise ValueError("Порядок B-дерева (m) має бути >= 3")
+            raise ValueError("m must be >= 3")
         self.m = m
         self._root = BTreeNode(self.m, True)
 
