@@ -1,4 +1,5 @@
 from tree_adt import Tree_ADT, TreeNode
+from visual import save_tree_snapshot
 
 class AVLNode(TreeNode):
     def __init__(self, data):
@@ -111,6 +112,7 @@ class AVL_Tree(Tree_ADT):
         y.left = t
         y.height = 1+max(self._get_height(y.left), self._get_height(y.right))
         x.height = 1+max(self._get_height(x.left), self._get_height(x.right))
+        save_tree_snapshot(self)
         return x
 
     def _rotate_left(self, x):
@@ -120,6 +122,7 @@ class AVL_Tree(Tree_ADT):
         x.right = t
         x.height = 1+max(self._get_height(x.left), self._get_height(x.right))
         y.height = 1+max(self._get_height(y.left), self._get_height(y.right))
+        save_tree_snapshot(self)
         return y
 
     def find(self, value):
@@ -168,3 +171,23 @@ class AVL_Tree(Tree_ADT):
 
         recurse(self._root)
         return iter(lst)
+
+# if __name__ == '__main__':
+#     import shutil
+#     import os
+#     import visual
+#     from visual import set_label, make_gif
+#     if os.path.exists("frames"):
+#         shutil.rmtree("frames")
+#     visual._default_viz = visual.AVLVisualizer()
+#     tree = AVL_Tree()
+#     values_to_add = [30, 20, 10, 40, 50, 25, 27]
+#     for val in values_to_add:
+#         set_label(f"Add: {val}")
+#         tree.add(val)
+#         visual.save_tree_snapshot(tree)
+#     set_label("Delete: 20 (Rebalancing)")
+#     tree.delete(20)
+#     visual.save_tree_snapshot(tree)
+#     make_gif("frames", "avl_animation.gif", frame_ms=1000, last_ms=3000)
+#     print("Done")

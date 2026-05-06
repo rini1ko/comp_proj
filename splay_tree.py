@@ -1,4 +1,5 @@
 from tree_adt import Tree_ADT
+from visual import save_tree_snapshot
 class SplayNode:
     def __init__(self, data, left=None, right=None, parent=None):
         self.data = data
@@ -21,6 +22,7 @@ class Splay_tree(Tree_ADT):
             p.parent.right = node
         node.left = p
         p.parent = node
+        save_tree_snapshot(self)
 
     def _rotate_right(self, node):
         p = node.parent
@@ -36,6 +38,7 @@ class Splay_tree(Tree_ADT):
             p.parent.right = node
         node.right = p
         p.parent = node
+        save_tree_snapshot(self)
 
     def zig(self, node):
         if node.parent.left==node:
@@ -117,7 +120,7 @@ class Splay_tree(Tree_ADT):
                 else:
                     self.splay(curr)
                     break
-
+        save_tree_snapshot(self)
 
     def delete(self, item):
         if self.is_empty():
@@ -155,6 +158,7 @@ class Splay_tree(Tree_ADT):
                 right.parent=max_node
             self._root=max_node
         self._size-=1
+        save_tree_snapshot(self)
 
     def inorder(self):
         lst = []
@@ -220,15 +224,18 @@ def validate_tree_integrity(tree):
         return False, "Структурна цілісність (parent pointers) порушена."
     return True, f"OK: {len(values)} вузлів, BST та структура в нормі."
 
-if __name__=='__main__':
-    tree1 = Splay_tree()
-    for i in range(1, 6):
-        tree1.add(i)
-    success, message = validate_tree_integrity(tree1)
-    print(message)
-    tree1.delete(3)
-    success, message = validate_tree_integrity(tree1)
-    print(message)
-    tree1.add(19)
-    success, message = validate_tree_integrity(tree1)
-    print(message)
+# if __name__ == '__main__':
+#     import shutil
+#     from visual import set_label, make_gif
+#     import os
+#     if os.path.exists("frames"):
+#         shutil.rmtree("frames")
+#     tree1 = Splay_tree()
+#     values_to_add = [3, 8, 5,7, 4, 6, 1,2]
+#     for val in values_to_add:
+#         set_label(f"Add: {val}")
+#         tree1.add(val)
+#     set_label(f"Find: 4")
+#     tree1.find(4)
+#     make_gif("frames", "splay_animation.gif", frame_ms=1000, last_ms=2500)
+#     print("Done")
