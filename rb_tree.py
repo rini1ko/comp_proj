@@ -248,7 +248,7 @@ class RBTree(Tree_ADT):
         x = self._search_node(value)
         if x is self._nil:
             return False, None
-        return True, x.data
+        return True, x
 
     def inorder(self):
         lst = []
