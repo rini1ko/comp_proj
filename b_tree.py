@@ -27,9 +27,9 @@ class BTree(Tree_ADT):
         while i < len(node.keys) and value > node.keys[i]:
             i += 1
         if i < len(node.keys) and value == node.keys[i]:
-            return True
+            return True, node.keys[i]
         elif node.leaf:
-            return False
+            return False, None
         else:
             return self.find(value, node.children[i])
 

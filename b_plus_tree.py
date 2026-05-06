@@ -32,8 +32,8 @@ class BPlusTree(Tree_ADT):
 
         for key in node.keys:
             if key == value:
-                return True
-        return False
+                return True, key
+        return False, None
 
     def inorder(self):
         result = []

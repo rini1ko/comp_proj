@@ -15,6 +15,12 @@ class Record:
     def __eq__(self, other):
         return self.key == other.key
 
+    def __ge__(self, other):
+        return self.key >= other.key
+
+    def __le__(self, other):
+        return self.key <= other.key
+
     def __repr__(self):
         return f"({self.key}: {self.value})"
 
@@ -63,11 +69,13 @@ class DatabaseEngine:
                 except json.JSONDecodeError:
                     data= parts[2]
                 dummy=Record(record_id, None)
-                found, node =self.tree.find(dummy)
+                found, result =self.tree.find(dummy)
 
                 if found:
                     visual.set_label(f"UPDATE: {record_id}")
-                    node.data.value = data
+                    # Універсальне діставання запису для всіх типів дерев
+                    record = result.data if hasattr(result, 'data') else result
+                    record.value = data
                     visual.save_tree_snapshot(self.tree)
                     return f"OK: Record {record_id} updated"
                 else:
@@ -81,9 +89,10 @@ class DatabaseEngine:
             try:
                 record_id = int(parts[1])
                 dummy = Record(record_id, None)
-                found, node = self.tree.find(dummy)
+                found, result = self.tree.find(dummy)
                 if found:
-                    return f"OK: Found {node.data}"
+                    record = result.data if hasattr(result, 'data') else result
+                    return f"OK: Found {record.value}"
                 else:
                     return "Error: Record not found"
             except ValueError:
