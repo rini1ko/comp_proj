@@ -73,7 +73,6 @@ class DatabaseEngine:
 
                 if found:
                     visual.set_label(f"UPDATE: {record_id}")
-                    # Універсальне діставання запису для всіх типів дерев
                     record = result.data if hasattr(result, 'data') else result
                     record.value = data
                     visual.save_tree_snapshot(self.tree)

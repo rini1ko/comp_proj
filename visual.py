@@ -150,13 +150,10 @@ class Visualizer:
 
         min_x, max_x = min(px.values()), max(px.values())
         max_extent = max(abs(min_x), abs(max_x))
-        
-        # ЗАХИСТ ВІД ВИЛАЗІННЯ ПО ШИРИНІ (додано 4 радіуси запасу)
         half_width = max(6.0, max_extent + self.NODE_R * 4.0)
         ax.set_xlim(-half_width, half_width)
 
         y_step = 2.5
-        # ЗАХИСТ ВІД ВИЛАЗІННЯ ЗНИЗУ ТА ЗВЕРХУ
         y_bottom = -max(3, d) * y_step - self.NODE_R * 4.0
         ax.set_ylim(y_bottom, 2.0 + self.NODE_R * 2.0)
         
@@ -320,8 +317,7 @@ class BTreeVisualizer:
 
         min_x, max_x = min(px.values()), max(px.values())
         max_extent = max(abs(min_x), abs(max_x))
-        
-        # ЗАХИСТ ВІД ВИЛАЗІННЯ БЛОКІВ
+
         half_width = max(8.0, max_extent + self.KEY_W * 4.0)
         ax.set_xlim(-half_width, half_width)
 
