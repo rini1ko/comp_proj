@@ -123,6 +123,7 @@ python benchmark.py --sizes 1000 5000 10000 25000 --repeats 3
 python benchmark.py --no-splay --no-bplus
 python benchmark.py --quick --no-sqlite --output test_run
 ```
+Звіт: https://drive.google.com/file/d/1nSlI6GxNGodkLpHqFkrAhC-pN53c1xOy/view?usp=sharing
 
 Результати збережуться в папці `results/` (або тій, що вкажете в `--output`).
 
