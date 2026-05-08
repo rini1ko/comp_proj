@@ -11,14 +11,13 @@ from b_plus_tree import BPlusTree
 
 def main():
     parser = argparse.ArgumentParser(description="Tree-based Database Engine")
-    # Додали btree та bplus у choices
-    parser.add_argument("--tree", choices=["avl", "splay", "rb", "btree", "bplus"], default="avl", help="Choose tree structure")
+    parser = argparse.ArgumentParser(description="Tree-based Database Engine")
+    parser.add_argument("--tree", choices=["avl", "splay", "rb", "btree", "bplus", "2-3"], default="avl", help="Choose tree structure")
     args = parser.parse_args()
 
     if os.path.exists("frames"):
         shutil.rmtree("frames", ignore_errors=True)
 
-    # Вибір дерева та прив'язка візуалізатора
     if args.tree == "avl":
         selected_tree = AVL_Tree()
         visual._default_viz = visual.AVLVisualizer()
@@ -29,7 +28,10 @@ def main():
         selected_tree = RBTree()
         visual._default_viz = visual.RBVisualizer()
     elif args.tree == "btree":
-        selected_tree = BTree(m=4)  # m - це максимальна кількість дітей
+        selected_tree = BTree(m=4)
+        visual._default_viz = visual.BTreeVisualizer()
+    elif args.tree == "2-3":
+        selected_tree = BTree(m=3)
         visual._default_viz = visual.BTreeVisualizer()
     elif args.tree == "bplus":
         selected_tree = BPlusTree(m=4)
