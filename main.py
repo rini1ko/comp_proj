@@ -8,9 +8,9 @@ from splay_tree import Splay_tree
 from rb_tree import RBTree
 from b_tree import BTree
 from b_plus_tree import BPlusTree
+from twothree_tree import TwoThreeTree
 
 def main():
-    parser = argparse.ArgumentParser(description="Tree-based Database Engine")
     parser = argparse.ArgumentParser(description="Tree-based Database Engine")
     parser.add_argument("--tree", choices=["avl", "splay", "rb", "btree", "bplus", "2-3"], default="avl", help="Choose tree structure")
     args = parser.parse_args()
@@ -31,7 +31,7 @@ def main():
         selected_tree = BTree(m=4)
         visual._default_viz = visual.BTreeVisualizer()
     elif args.tree == "2-3":
-        selected_tree = BTree(m=3)
+        selected_tree = TwoThreeTree()
         visual._default_viz = visual.BTreeVisualizer()
     elif args.tree == "bplus":
         selected_tree = BPlusTree(m=4)
@@ -63,7 +63,10 @@ def main():
             print("\nExiting database...")
             break
 
-    visual.make_gif("frames", f"{args.tree}_db_animation.gif", frame_ms=800, last_ms=3000)
+    gif_dir = os.path.join("results", "GIFs_with_database")
+    os.makedirs(gif_dir, exist_ok=True)
+    gif_path = os.path.join(gif_dir, f"{args.tree}_db_animation.gif")
+    visual.make_gif("frames", gif_path, frame_ms=800, last_ms=3000)
 
 if __name__ == "__main__":
     main()

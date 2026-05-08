@@ -2,7 +2,7 @@
 benchmark.py - Етап 3: порівняльне дослідження.
 
 Цей скрипт ганяє однакові операції (INSERT, SELECT, UPDATE, DELETE)
-на кожній реалізації дерева (AVL, Splay, RB, B-дерево, B+ дерево),
+на кожній реалізації дерева (AVL, Splay, RB, 2-3 дерево, B-дерево, B+ дерево),
 а також на справжній СУБД SQLite (для порівняння). Потім за результатами
 малює гарні графіки в темній темі та зводить усе в зручні таблиці.
 
@@ -11,8 +11,8 @@ benchmark.py - Етап 3: порівняльне дослідження.
     python benchmark.py
         Запуск зі стандартними налаштуваннями: розміри N = 1000, 2500, 5000,
         10000, 25000, 50000, по 1 повтору на кожне виконання, тестуються всі
-        дерева (AVL, Splay, RB, B-дерево, B+ дерево) та SQLite. Результати
-        складаються у каталог results/.
+        дерева (AVL, Splay, RB, 2-3 дерево, B-дерево, B+ дерево) та SQLite.
+        Результати складаються у каталог results/.
 
     python benchmark.py --sizes 1000 5000 10000 25000 50000 --repeats 3
         Власний список розмірів N (тут: 1000, 5000, 10000, 25000, 50000) і
@@ -27,9 +27,10 @@ benchmark.py - Етап 3: порівняльне дослідження.
 
     python benchmark.py --no-splay --no-bplus
         Вимкнути окремі структури з тестування. Тут пропускаються splay-
-        дерево та B+ дерево; решта (AVL, RB, B-дерево, SQLite) тестуються
-        як звичайно. Аналогічно працюють --no-avl, --no-rb, --no-btree,
-        --no-sqlite - можна комбінувати у будь-якому порядку.
+        дерево та B+ дерево; решта (AVL, RB, 2-3 дерево, B-дерево, SQLite)
+        тестуються як звичайно. Аналогічно працюють --no-avl, --no-rb,
+        --no-23, --no-btree, --no-sqlite - можна комбінувати у будь-якому
+        порядку.
 
 Усі результати зберігаються у каталог results/:
     results/raw_results.csv         - повні «сирі» дані
@@ -65,6 +66,7 @@ from splay_tree import Splay_tree
 from rb_tree import RBTree
 from b_tree import BTree
 from b_plus_tree import BPlusTree
+from twothree_tree import TwoThreeTree
 from database import Record
 
 try:
@@ -100,6 +102,7 @@ ENGINE_COLORS = {
     "AVL":     "#4dab6e",
     "Splay":   "#d4a820",
     "RB":      "#e05c6a",
+    "2-3 дерево": "#2bb5b5",
     "B-дерево":  "#4a7fd4",
     "B+ дерево": "#ff8c42",
     "SQLite":  "#c074ff",
@@ -466,17 +469,13 @@ def save_raw_csv(path, results):
 def _engines_in_order(results):
     """Повертає список структур у «правильному» порядку - щоб у легенді
     AVL завжди йшов першим, а SQLite - останнім."""
-    preferred = ["AVL", "Splay", "RB", "B-дерево", "B+ дерево", "SQLite"]
+    preferred = ["AVL", "Splay", "RB", "2-3 дерево", "B-дерево", "B+ дерево", "SQLite"]
     present = {r.engine for r in results}
     return [e for e in preferred if e in present]
 
 
 def plot_lines_grid(results, out_path):
-    """Сітка 2×2: 4 графіки часу від N - по одному на кожну операцію.
-
-    Осі обидві логарифмічні: на лінійній шкалі дрібні значення зливаються
-    в нуль, а нам цікаво, як саме часи ростуть зі збільшенням N.
-    """
+    """Сітка 2×2: 4 графіки часу від N - по одному на кожну операцію."""
     sizes = sorted({r.n for r in results})
     engines = _engines_in_order(results)
 
@@ -497,11 +496,9 @@ def plot_lines_grid(results, out_path):
                 ax.plot(xs, ys, marker="o", label=eng, color=ENGINE_COLORS.get(eng, "#888"))
 
         ax.set_title(op)
-        ax.set_xscale("log")
-        ax.set_yscale("log")
         ax.set_xlabel("N (кількість записів)")
-        ax.set_ylabel("час, мс (log)")
-        ax.grid(True, which="both", alpha=0.5)
+        ax.set_ylabel("час, мс")
+        ax.grid(True, alpha=0.5)
 
     handles, labels = axes[0, 0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", ncol=min(len(labels), 8), bbox_to_anchor=(0.5, -0.01), frameon=False)
@@ -529,11 +526,9 @@ def plot_lines_per_op(results, out_dir):
                 ax.plot(xs, ys, marker="o", label=eng, color=ENGINE_COLORS.get(eng, "#888"))
 
         ax.set_title(f"Середній час однієї операції {op}")
-        ax.set_xscale("log")
-        ax.set_yscale("log")
         ax.set_xlabel("N (кількість записів)")
-        ax.set_ylabel("час на операцію, мкс (log)")
-        ax.grid(True, which="both", alpha=0.5)
+        ax.set_ylabel("час на операцію, мкс")
+        ax.grid(True, alpha=0.5)
         ax.legend(loc="best", ncol=2)
         fig.tight_layout()
         fig.savefig(os.path.join(out_dir, f"lines_{op.lower()}.png"), bbox_inches="tight", facecolor=DARK["bg"])
@@ -576,8 +571,7 @@ def plot_bars_per_op(results, out_dir):
         bars = ax.bar(labels_s, vals_s, color=colors_s, edgecolor=DARK["grid"], linewidth=1.5)
         ax.set_title(f"{op}: середній час однієї операції при N = {n_max}")
         ax.set_ylabel("час на операцію, мкс")
-        ax.set_yscale("log")
-        ax.grid(True, axis="y", which="both", alpha=0.5)
+        ax.grid(True, axis="y", alpha=0.5)
 
         for bar, v in zip(bars, vals_s):
             ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), _fmt_us(v), ha="center", va="bottom", fontsize=9, color=DARK["text"])
@@ -599,6 +593,7 @@ def parse_args():
     p.add_argument("--no-avl", action="store_true", help="Не тестувати AVL-дерево")
     p.add_argument("--no-splay", action="store_true", help="Не тестувати splay-дерево")
     p.add_argument("--no-rb", action="store_true", help="Не тестувати червоно-чорне дерево")
+    p.add_argument("--no-23", dest="no_23", action="store_true", help="Не тестувати 2-3 дерево")
     p.add_argument("--no-btree", action="store_true", help="Не тестувати B-дерево")
     p.add_argument("--no-bplus", action="store_true", help="Не тестувати B+ дерево")
 
@@ -620,6 +615,8 @@ def build_engines(args):
         engines.append(TreeEngine("Splay", lambda: Splay_tree()))
     if not args.no_rb:
         engines.append(TreeEngine("RB", lambda: RBTree()))
+    if not args.no_23:
+        engines.append(TreeEngine("2-3 дерево", lambda: TwoThreeTree()))
     if not args.no_btree:
         m = args.btree_m
         engines.append(TreeEngine("B-дерево", lambda m=m: BTree(m=m)))
@@ -671,7 +668,6 @@ def main():
     print(f" Розміри N    : {args.sizes}")
     print(f" Повторів     : {args.repeats}")
     print(f" Структури    : {[e.name for e in engines]}")
-    print(f" Каталог      : {os.path.abspath(out_dir)}")
     print("-" * 72)
 
     t_start = time.perf_counter()
@@ -705,13 +701,7 @@ def main():
     plot_lines_per_op(results, plots_dir)
     plot_bars_per_op(results, plots_dir)
 
-    print()
-    print("=" * 72)
     print(f" Готово за {elapsed:.2f} с.")
-    print(f" Графіки    : {os.path.abspath(plots_dir)}")
-    print(f" Таблиці    : {os.path.abspath(tables_dir)}")
-    print(f" Сирі дані  : {os.path.abspath(os.path.join(out_dir, 'raw_results.csv'))}")
-    print("=" * 72)
     return 0
 
 

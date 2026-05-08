@@ -1,0 +1,5 @@
+# Встановлення:
+#   pip install -r requirements.txt
+
+matplotlib>=3.7,<4.0   # visual.py, benchmark.py — побудова кадрів і графіків
+Pillow>=10.0,<13.0     # visual.py — збирання GIF (from PIL import Image)
